@@ -5,43 +5,12 @@
  *      Author: root
  */
 #include <iostream>
-#include <event.h>
 #include <unistd.h>
 #include "XEvent.h"
 #include "easylogging++.h"
 using namespace std;
-struct event ev;
-struct event ev2;
-struct event ev3;
-struct timeval tv;
 
 XEventBase *base = new Epoll(1024);
-void time_cb(int fd, short event, void *arg)
-{
-	printf("timer wakeup\n");
-	event_add(&ev, &tv);
-}
-void read_cb(int fd, short event, void *arg)
-{
-	cout << "read cb" << endl;
-	char buf[256];
-	int n = read(fd, buf, 256);
-	if (n > 0) {
-		write(1, buf, n);
-		event_add(&ev2, NULL);
-	}
-}
-void read_cb2(int fd, short event, void *arg)
-{
-	cout << "read cb2" << endl;
-	char buf[256];
-	int n = read(fd, buf, 256);
-	if (n > 0) {
-		write(1, buf, n);
-		event_add(&ev3, NULL);
-	}
-}
-
 void mycb(XEvent *ev, int a)
 {
 	cout << "a=" << a << endl;
@@ -60,21 +29,6 @@ void mycb(XEvent *ev, int a)
 		base->del(ev->fd_);
 		delete ev;
 	}
-}
-void test()
-{
-	cout << "Hello World." << endl;
-	struct event_base *base = event_init();
-	tv.tv_sec = 6;
-	tv.tv_usec = 0;
-	evtimer_set(&ev, time_cb, NULL);
-
-	event_set(&ev2, 0, EV_READ, read_cb, NULL);
-	event_add(&ev, &tv);
-	event_add(&ev2, NULL);
-	event_set(&ev3, 0, EV_READ, read_cb2, NULL);
-	cout << event_add(&ev, NULL) << endl;
-	event_base_dispatch(base);
 }
 
 void hello_cb(int a)
