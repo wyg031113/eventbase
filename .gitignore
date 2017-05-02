@@ -1,0 +1,4 @@
+LibEventTest
+*.o
+Debug
+logs
